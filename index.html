@@ -13,9 +13,139 @@
 
   body {
     margin: 0;
-    font-family: 'Oswald
+    font-family: 'Oswald', Arial, sans-serif;
+    background: #000;
+    color: white;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.92)),
+      url('https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(2px);
+    transform: scale(1.05);
+    z-index: -3;
+  }
+
+  .background-logo {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  .background-logo img {
+    width: 950px;
+    opacity: 0.12;
+    filter: grayscale(100%) brightness(1.2);
+  }
+
+  .menu {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    height: 100vh;
+    width: 100vw;
+    padding: 35px;
+    gap: 25px;
+  }
+
+  .panel {
+    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.42);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 28px;
+  }
+
+  h2 {
+    margin: 0 0 18px;
+    font-size: 34px;
+    letter-spacing: 1px;
+    color: #fff;
+    border-bottom: 3px solid #d71f1f;
+    padding-bottom: 10px;
+  }
+
+  .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    font-size: 24px;
+    margin: 12px 0;
+    border-bottom: 1px dotted rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+  }
+
+  .price {
+    color: #ffb300;
+    font-weight: 700;
+  }
+
+  .subtext {
+    color: #d2b48c;
+    font-size: 16px;
+    margin-top: -8px;
+    margin-bottom: 10px;
+  }
+
+  .hero-title {
+    text-align: center;
+    font-size: 70px;
+    color: rgba(255,255,255,0.08);
+    letter-spacing: 6px;
+    margin-bottom: 20px;
+  }
+
+  .combo-box {
+    margin-top: 30px;
+    border: 2px solid #ffb300;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,140,0,0.08);
+  }
+
+  .combo-box h3 {
+    margin: 0;
+    font-size: 40px;
+    color: #ff3b3b;
+  }
+
+  .combo-box p {
+    margin: 10px 0 0;
+    font-size: 24px;
+  }
+
+  .note {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 13px;
+    z-index: 5;
+  }
+</style>
 </head>
 <body>
+
+<div class="background-logo">
+  <!-- Put your uploaded logo image in the same folder as index.html -->
+  <img src="logo.jpg" alt="Slices of Brooklyn Logo">
+</div>
 
 <div class="menu">
 
@@ -23,95 +153,79 @@
   <div class="panel">
     <h2>PIZZA BY THE SLICE</h2>
 
-    <!-- EDIT ITEMS HERE -->
     <div class="item"><span>Cheese Slice</span><span class="price">$3.50</span></div>
     <div class="item"><span>Pepperoni Slice</span><span class="price">$4.25</span></div>
-    <div class="item"><span>Vodka Slice</span><span class="price">$5.00</span></div>
-    <div class="item"><span>Buffalo Chicken Slice</span><span class="price">$5.25</span></div>
+    <div class="item"><span>Vodka Slice</span><span class="price">$4.75</span></div>
+    <div class="item"><span>Buffalo Chicken Slice</span><span class="price">$5.00</span></div>
+    <div class="item"><span>BBQ Chicken Slice</span><span class="price">$5.00</span></div>
+    <div class="item"><span>Meat Lovers Slice</span><span class="price">$5.25</span></div>
+    <div class="item"><span>Veggie Slice</span><span class="price">$4.50</span></div>
+    <div class="item"><span>White Slice</span><span class="price">$4.75</span></div>
+    <div class="subtext">Ricotta, Mozzarella, Garlic, Olive Oil</div>
 
     <h2 style="margin-top:40px;">SQUARE SLICES</h2>
-    <div class="item"><span>Sicilian Slice</span><span class="price">$4.75</span></div>
-    <div class="item"><span>Grandma Slice</span><span class="price">$5.00</span></div>
 
+    <div class="item"><span>Sicilian Slice</span><span class="price">$4.50</span></div>
+    <div class="item"><span>Grandma Slice</span><span class="price">$4.75</span></div>
+    <div class="item"><span>Vodka Square</span><span class="price">$5.25</span></div>
+    <div class="item"><span>Upside Down Slice</span><span class="price">$5.25</span></div>
   </div>
 
   <!-- CENTER COLUMN -->
-  <div class="panel center">
-    <img class="logo" src="/blob/main/IMG-20260524-WA0014.jpg" alt="Slices Brooklyn Logo">
-    <div class="tagline">BROOKLYN STYLE • FRESH DAILY • HOT & READY</div>
+  <div class="panel">
 
-    <div style="margin-top:40px;text-align:center;font-size:24px;color:#ffcc00;">
-      LIVE MENU POWERED BY GOOGLE SHEETS
-    </div>
+    <div class="hero-title">BROOKLYN STYLE</div>
+
+    <h2>HOT HEROES</h2>
+
+    <div class="item"><span>Chicken Parm Hero</span><span class="price">$12.50</span></div>
+    <div class="item"><span>Meatball Parm Hero</span><span class="price">$11.50</span></div>
+    <div class="item"><span>Sausage & Peppers Hero</span><span class="price">$11.50</span></div>
+    <div class="item"><span>Philly Cheesesteak</span><span class="price">$13.50</span></div>
+    <div class="item"><span>Italian Combo Hero</span><span class="price">$13.50</span></div>
+
+    <h2 style="margin-top:40px;">EXTRAS & ADD-ONS</h2>
+
+    <div class="item"><span>Extra Cheese</span><span class="price">$1.25</span></div>
+    <div class="item"><span>Pepperoni</span><span class="price">$1.25</span></div>
+    <div class="item"><span>Sausage</span><span class="price">$1.50</span></div>
+    <div class="item"><span>Mushrooms</span><span class="price">$1.00</span></div>
+    <div class="item"><span>Garlic Knots (6)</span><span class="price">$4.50</span></div>
+
   </div>
 
   <!-- RIGHT COLUMN -->
   <div class="panel">
+
     <h2>APPETIZERS</h2>
 
     <div class="item"><span>Garlic Knots</span><span class="price">$4.50</span></div>
     <div class="item"><span>Mozzarella Sticks</span><span class="price">$6.50</span></div>
+    <div class="item"><span>Jalapeño Poppers</span><span class="price">$6.50</span></div>
     <div class="item"><span>Chicken Tenders</span><span class="price">$7.50</span></div>
+    <div class="item"><span>Loaded Fries</span><span class="price">$6.95</span></div>
 
     <h2 style="margin-top:40px;">DRINKS</h2>
-    <div class="item"><span>Soda</span><span class="price">$2.75</span></div>
+
+    <div class="item"><span>Fountain Soda</span><span class="price">$2.75</span></div>
+    <div class="item"><span>Bottled Soda</span><span class="price">$2.75</span></div>
     <div class="item"><span>Water</span><span class="price">$1.75</span></div>
+    <div class="item"><span>Pure Leaf Tea</span><span class="price">$2.75</span></div>
+
+    <div class="combo-box">
+      <h3>MAKE IT A COMBO!</h3>
+      <p>Add a fountain drink & any side for <span class="price">$3.50</span></p>
+    </div>
+
   </div>
 
 </div>
 
 <div class="note">
-  EDIT PRICES DIRECTLY IN HTML • OPTIMIZED FOR 4K TV DISPLAY (3840x2160)
+  4K DIGITAL MENU • EDIT PRICES DIRECTLY IN INDEX.HTML • SLICES OF BROOKLYN
 </div>
 
-<!-- GOOGLE SHEETS INTEGRATION -->
-<script>
-/*
-====================================================
-HOW TO CONNECT GOOGLE SHEETS
-====================================================
-
-1. Create a Google Sheet
-2. Add columns:
-   CATEGORY | ITEM | PRICE
-
-Example:
-PIZZA BY THE SLICE | Cheese Slice | 3.50
-
-3. Publish sheet to web:
-   File > Share > Publish to Web
-
-4. Use SheetDB or Opensheet API
-
-5. Replace YOUR_GOOGLE_SHEET_API_URL below
-====================================================
-*/
-
-const SHEET_API = 'YOUR_GOOGLE_SHEET_API_URL';
-
-async function loadMenu() {
-  if(SHEET_API === 'YOUR_GOOGLE_SHEET_API_URL') return;
-
-  try {
-    const response = await fetch(SHEET_API);
-    const data = await response.json();
-
-    console.log('Menu Loaded:', data);
-
-    // Here you can dynamically rebuild menu sections
-    // from spreadsheet rows.
-
-  } catch (error) {
-    console.error('Spreadsheet connection error:', error);
-  }
-}
-
-loadMenu();
-
-// Auto refresh every 60 seconds
-setInterval(loadMenu, 60000);
-</script>
-
 </body>
+</html>
 </html>
 
