@@ -1,109 +1,741 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Slices of Brooklyn Menu</title>
-
+<meta name="viewport" content="width=3840, initial-scale=1.0">
+<title>Pizza Menu Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-  overflow: hidden;
-}
+  /* ═══════════════════════════════════════════════════
+     CSS VARIABLES — edit these to re-theme the board
+  ═══════════════════════════════════════════════════ */
+  :root {
+    --bg:          #0D0A06;
+    --bg2:         #150F08;
+    --panel:       #1C1408;
+    --panel-hover: #231A0A;
+    --border:      #3A2A10;
+    --gold:        #D4920A;
+    --gold-light:  #F0B429;
+    --gold-pale:   #F5D78E;
+    --red:         #C0392B;
+    --cream:       #F5EDD6;
+    --muted:       #9A8A6A;
+    --white:       #FFFDF7;
+    --green:       #27AE60;
+    --blue:        #2980B9;
 
-/* Background logo */
-body::before {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  transform: translate(-50%, -50%);
-  background: url("logo.jpg") no-repeat center;
-  background-size: contain;
-  opacity: 0.10;
-  z-index: 0;
-}
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-heading: 'Barlow Condensed', sans-serif;
+    --font-body:    'Barlow', sans-serif;
 
-.header {
-  text-align: center;
-  font-size: 60px;
-  padding: 30px;
-  letter-spacing: 4px;
-  position: relative;
-  z-index: 2;
-}
+    /* 4K sizing — everything scales from this base */
+    --base: 1px;
+  }
 
-.menu {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  padding: 40px;
-  position: relative;
-  z-index: 2;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.item {
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  padding-bottom: 15px;
-}
+  html, body {
+    width: 3840px;
+    min-height: 2160px;
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
 
-.name {
-  font-size: 34px;
-  font-weight: bold;
-}
+  /* ── Grain texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.5;
+  }
 
-.desc {
-  font-size: 18px;
-  opacity: 0.7;
-}
+  /* ═══════════════════════════
+     HEADER
+  ═══════════════════════════ */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 120px 42px;
+    border-bottom: 3px solid var(--border);
+    background: linear-gradient(180deg, #1A1005 0%, transparent 100%);
+    position: relative;
+  }
 
-.price {
-  float: right;
-  font-size: 30px;
-  color: gold;
-}
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .logo-emblem {
+    width: 160px; height: 160px;
+    border: 4px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    background: radial-gradient(circle at 40% 35%, #2A1C08, #0D0A06);
+    box-shadow: 0 0 60px rgba(212,146,10,0.25), inset 0 0 30px rgba(212,146,10,0.08);
+    flex-shrink: 0;
+  }
+
+  .logo-emblem span {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 1;
+    color: var(--gold-light);
+  }
+
+  .logo-text h1 {
+    font-family: var(--font-display);
+    font-size: 108px;
+    line-height: 0.9;
+    color: var(--white);
+    font-weight: 900;
+    letter-spacing: -2px;
+  }
+
+  .logo-text h1 em {
+    color: var(--gold-light);
+    font-style: italic;
+  }
+
+  .logo-text p {
+    font-family: var(--font-heading);
+    font-size: 34px;
+    letter-spacing: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .header-divider {
+    width: 3px;
+    height: 120px;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+    flex-shrink: 0;
+  }
+
+  .header-tagline {
+    text-align: center;
+    flex: 1;
+  }
+
+  .header-tagline .big {
+    font-family: var(--font-display);
+    font-size: 52px;
+    color: var(--gold-pale);
+    font-style: italic;
+  }
+
+  .header-tagline .small {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    letter-spacing: 6px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .clock {
+    font-family: var(--font-heading);
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 4px;
+    line-height: 1;
+  }
+
+  .date-line {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    color: var(--muted);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .refresh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 10px 22px;
+    background: rgba(212,146,10,0.1);
+    border: 1px solid rgba(212,146,10,0.3);
+    border-radius: 40px;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .refresh-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ═══════════════════════════
+     MAIN GRID
+  ═══════════════════════════ */
+  .board {
+    padding: 80px 100px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 60px;
+    align-items: start;
+  }
+
+  /* Full-width category that spans all 4 cols */
+  .category-block { }
+  .category-block.wide { grid-column: 1 / -1; }
+
+  /* ── Category heading ── */
+  .cat-title {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .cat-title-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .cat-title-line.left {
+    background: linear-gradient(270deg, var(--gold) 0%, var(--border) 60%, transparent 100%);
+    max-width: 80px;
+  }
+
+  .cat-title h2 {
+    font-family: var(--font-heading);
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .cat-icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  /* ── Menu item card ── */
+  .item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 44px;
+    margin-bottom: 20px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .item:hover {
+    border-color: rgba(212,146,10,0.4);
+    background: var(--panel-hover);
+  }
+
+  .item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .item-name {
+    font-family: var(--font-heading);
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+    flex: 1;
+  }
+
+  .item-desc {
+    font-family: var(--font-body);
+    font-size: 26px;
+    color: var(--muted);
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+
+  /* Pricing */
+  .price-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .price-single {
+    font-family: var(--font-heading);
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--gold-light);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .price-multi {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .price-tier {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .price-tier .size {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .price-tier .amt {
+    font-family: var(--font-heading);
+    font-size: 46px;
+    font-weight: 800;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .price-divider {
+    width: 1px;
+    height: 50px;
+    background: var(--border);
+  }
+
+  /* Badges */
+  .badge {
+    position: absolute;
+    top: -18px; right: 36px;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .badge-POPULAR  { background: var(--red);   color: #fff; box-shadow: 0 4px 20px rgba(192,57,43,0.5); }
+  .badge-NEW      { background: var(--green);  color: #fff; box-shadow: 0 4px 20px rgba(39,174,96,0.5); }
+  .badge-SEASONAL { background: #8E44AD;       color: #fff; box-shadow: 0 4px 20px rgba(142,68,173,0.5); }
+  .badge-SOLDOUT  { background: #555;          color: #ccc; }
+  .badge-FEATURED { background: var(--gold);   color: #111; box-shadow: 0 4px 20px rgba(212,146,10,0.5); }
+
+  /* Wide grid for small-single-price categories (drinks, desserts, starters) */
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .item-grid .item {
+    margin-bottom: 0;
+  }
+
+  /* ═══════════════════════════
+     FOOTER / TICKER
+  ═══════════════════════════ */
+  .footer {
+    border-top: 2px solid var(--border);
+    background: #100C05;
+    padding: 36px 120px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 80px;
+    position: relative;
+  }
+
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  }
+
+  .footer-note {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .footer-note strong {
+    color: var(--gold-pale);
+  }
+
+  /* ═══════════════════════════
+     LOADING / ERROR STATES
+  ═══════════════════════════ */
+  .loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .loading-screen h2 {
+    font-family: var(--font-display);
+    font-size: 80px;
+    color: var(--gold-pale);
+    font-style: italic;
+  }
+
+  .spinner {
+    width: 80px; height: 80px;
+    border: 6px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    background: rgba(192,57,43,0.15);
+    border: 2px solid var(--red);
+    border-radius: 16px;
+    padding: 48px 80px;
+    font-family: var(--font-heading);
+    font-size: 36px;
+    color: #E74C3C;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 2000px;
+    margin: 80px auto;
+  }
+
+  /* Decorative corner ornaments on board */
+  .board-ornament {
+    text-align: center;
+    margin-bottom: 40px;
+    font-family: var(--font-display);
+    font-size: 34px;
+    color: var(--border);
+    letter-spacing: 16px;
+  }
 </style>
 </head>
-
 <body>
 
-<div class="header">SLICES BY THE SHORE</div>
+<!-- ═══════════════════════════════════════════════════════════
+     ⚙️  CONFIGURATION — paste your Google Sheets CSV URL below
+════════════════════════════════════════════════════════════════
+  HOW TO GET YOUR URL:
+  1. Open your Google Sheet
+  2. File → Share → Publish to web
+  3. Choose "Entire Document" + "Comma-separated values (.csv)"
+  4. Click Publish, copy the URL
+  5. Paste it as the value of SHEET_CSV_URL below
+════════════════════════════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+  // ← PASTE YOUR GOOGLE SHEETS CSV PUBLISH URL HERE ↓
+  SHEET_CSV_URL: "",
 
-<div class="menu" id="menu"></div>
+  STORE_NAME:    "PIZZERIA",
+  STORE_TAGLINE: "Wood-Fired Since 1987",
+  STORE_MOTTO:   "Crafted with love, baked to perfection",
+
+  REFRESH_SECONDS: 60,   // How often to re-fetch the sheet
+
+  // Category display icons (emoji or leave "" to hide)
+  CATEGORY_ICONS: {
+    "Pizza":    "🍕",
+    "Starters": "🥗",
+    "Pasta":    "🍝",
+    "Salads":   "🥗",
+    "Drinks":   "🥤",
+    "Desserts": "🍮",
+  },
+
+  // Categories that should span the full width
+  WIDE_CATEGORIES: ["Pizza"],
+};
+</script>
+
+<header class="header">
+  <div class="logo-area">
+    <div class="logo-emblem"><span>🍕</span></div>
+    <div class="logo-text">
+      <h1 id="storeName">PIZZERIA</h1>
+      <p id="storeTagline">Wood-Fired Since 1987</p>
+    </div>
+  </div>
+
+  <div class="header-divider"></div>
+
+  <div class="header-tagline">
+    <div class="big" id="storeMotto">Crafted with love, baked to perfection</div>
+    <div class="small">Fresh · Authentic · Handmade Daily</div>
+  </div>
+
+  <div class="header-divider"></div>
+
+  <div class="header-right">
+    <div class="clock" id="clock">--:--</div>
+    <div class="date-line" id="dateLine">---</div>
+    <div class="refresh-badge">
+      <div class="refresh-dot" id="refreshDot"></div>
+      <span id="refreshLabel">Live Menu</span>
+    </div>
+  </div>
+</header>
+
+<main id="board" class="board">
+  <div style="grid-column:1/-1">
+    <div class="loading-screen">
+      <div class="spinner"></div>
+      <h2>Loading Menu…</h2>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-note">⚠️ Please inform staff of any <strong>allergies</strong> before ordering.</div>
+  <div class="footer-note">Prices in <strong>USD</strong> · Subject to change without notice.</div>
+  <div class="footer-note">Ask about our <strong>daily specials</strong> and seasonal offerings.</div>
+  <div class="footer-note" id="lastUpdated">Last updated: —</div>
+</footer>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxPvEMH-tg5kjtOiYRbLRlWEPzrzLYmNUO0EbAz26DP7krMlCpiL6DRhMvKwrwKuKh0Ew/exec";
+// ─── Apply config ───────────────────────────────────────────
+document.getElementById("storeName").textContent  = CONFIG.STORE_NAME;
+document.getElementById("storeTagline").textContent = CONFIG.STORE_TAGLINE;
+document.getElementById("storeMotto").textContent   = CONFIG.STORE_MOTTO;
 
-async function loadMenu() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
+// ─── Clock ──────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hh = ((h % 12) || 12).toString().padStart(2, "0");
+  const mm = m.toString().padStart(2, "0");
+  document.getElementById("clock").textContent = `${hh}:${mm} ${ampm}`;
 
-  const menu = document.getElementById("menu");
-  menu.innerHTML = "";
+  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  document.getElementById("dateLine").textContent =
+    `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}`;
+}
+updateClock();
+setInterval(updateClock, 15000);
 
-  data.forEach(item => {
-    menu.innerHTML += `
-      <div class="item">
-        <div class="name">
-          ${item.name}
-          <span class="price">$${item.price}</span>
-        </div>
-        <div class="desc">${item.description || ""}</div>
-      </div>
-    `;
+// ─── CSV parser ─────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split("\n").map(l => l.replace(/\r/g, ""));
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+  return lines.slice(1).map(line => {
+    // Handle quoted fields
+    const cells = [];
+    let cur = "", inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQ = !inQ; }
+      else if (line[i] === ',' && !inQ) { cells.push(cur.trim()); cur = ""; }
+      else cur += line[i];
+    }
+    cells.push(cur.trim());
+    const row = {};
+    headers.forEach((h, i) => row[h] = (cells[i] || "").replace(/^"|"$/g, ""));
+    return row;
   });
 }
 
-loadMenu();
-setInterval(loadMenu, 60000); // refresh every 60 sec
-</script>
+// ─── Render helpers ─────────────────────────────────────────
+function fmtPrice(val) {
+  const n = parseFloat(val);
+  return isNaN(n) ? null : `$${n.toFixed(2)}`;
+}
 
+function renderPrices(item) {
+  const s = fmtPrice(item.price_small);
+  const m = fmtPrice(item.price_medium);
+  const l = fmtPrice(item.price_large);
+  if (!m && !l && s) {
+    return `<div class="price-single">${s}</div>`;
+  }
+  let html = `<div class="price-multi">`;
+  if (s) html += `<div class="price-tier"><span class="size">Sm</span><span class="amt">${s}</span></div>`;
+  if (s && m) html += `<div class="price-divider"></div>`;
+  if (m) html += `<div class="price-tier"><span class="size">Md</span><span class="amt">${m}</span></div>`;
+  if (m && l) html += `<div class="price-divider"></div>`;
+  if (l) html += `<div class="price-tier"><span class="size">Lg</span><span class="amt">${l}</span></div>`;
+  html += `</div>`;
+  return html;
+}
+
+function renderItem(item) {
+  const badge = (item.badge || "").trim().toUpperCase().replace(/\s/g, "");
+  const badgeHTML = badge
+    ? `<div class="badge badge-${badge}">${item.badge}</div>`
+    : "";
+  return `
+    <div class="item">
+      ${badgeHTML}
+      <div class="item-top">
+        <div>
+          <div class="item-name">${item.name}</div>
+          ${item.description ? `<div class="item-desc">${item.description}</div>` : ""}
+        </div>
+        <div class="price-area">${renderPrices(item)}</div>
+      </div>
+    </div>`;
+}
+
+function renderBoard(rows) {
+  // Filter available
+  const items = rows.filter(r => {
+    const av = (r.available || "").trim().toUpperCase();
+    return av === "" || av === "TRUE" || av === "1" || av === "YES";
+  });
+
+  // Group by category (preserve order)
+  const order = [];
+  const groups = {};
+  items.forEach(item => {
+    const cat = item.category || "Other";
+    if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+    groups[cat].push(item);
+  });
+
+  const board = document.getElementById("board");
+  board.innerHTML = `<div style="grid-column:1/-1" class="board-ornament">— ✦ —</div>`;
+
+  // Determine layout: wide cats span full row; others fill 1 column each
+  // We'll lay out column by column using a simple block structure
+  order.forEach(cat => {
+    const isWide = CONFIG.WIDE_CATEGORIES.includes(cat);
+    const icon = CONFIG.CATEGORY_ICONS[cat] || "";
+
+    const block = document.createElement("div");
+    block.className = "category-block" + (isWide ? " wide" : "");
+
+    const catItems = groups[cat];
+
+    let itemsHTML;
+    if (isWide) {
+      // Wide: items laid out in a 4-col grid
+      itemsHTML = `<div class="item-grid">${catItems.map(renderItem).join("")}</div>`;
+    } else {
+      itemsHTML = catItems.map(renderItem).join("");
+    }
+
+    block.innerHTML = `
+      <div class="cat-title">
+        <div class="cat-title-line left"></div>
+        ${icon ? `<span class="cat-icon">${icon}</span>` : ""}
+        <h2>${cat}</h2>
+        <div class="cat-title-line"></div>
+      </div>
+      ${itemsHTML}`;
+
+    board.appendChild(block);
+  });
+
+  // Update timestamp
+  const now = new Date();
+  document.getElementById("lastUpdated").textContent =
+    `Updated: ${now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`;
+}
+
+// ─── Demo data (shown when no SHEET_CSV_URL is configured) ──
+const DEMO_DATA = [
+  {category:"Pizza",    name:"Margherita",         description:"San Marzano tomato, fresh mozzarella, basil",     price_small:"10.99", price_medium:"13.99", price_large:"16.99", available:"TRUE", badge:"POPULAR"},
+  {category:"Pizza",    name:"Pepperoni",           description:"House tomato sauce, pepperoni, mozzarella",        price_small:"11.99", price_medium:"14.99", price_large:"17.99", available:"TRUE", badge:""},
+  {category:"Pizza",    name:"BBQ Chicken",         description:"BBQ sauce, grilled chicken, red onion, cilantro",  price_small:"12.99", price_medium:"15.99", price_large:"18.99", available:"TRUE", badge:"NEW"},
+  {category:"Pizza",    name:"Veggie Supreme",      description:"Roasted peppers, mushrooms, olives, onions",       price_small:"11.49", price_medium:"14.49", price_large:"17.49", available:"TRUE", badge:""},
+  {category:"Starters", name:"Garlic Knots",        description:"House-baked, garlic butter, parsley (6 pcs)",      price_small:"5.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Starters", name:"Buffalo Wings",       description:"Crispy wings, buffalo sauce, blue cheese dip",     price_small:"9.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:"POPULAR"},
+  {category:"Starters", name:"Mozzarella Sticks",   description:"Golden fried, marinara dipping sauce (6 pcs)",     price_small:"7.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Pasta",    name:"Spaghetti & Meatballs",description:"House marinara, beef meatballs, parmesan",        price_small:"12.99", price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Pasta",    name:"Fettuccine Alfredo",  description:"Creamy alfredo sauce, parmesan, fresh parsley",    price_small:"11.99", price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Salads",   name:"Caesar Salad",        description:"Romaine, house caesar dressing, croutons",         price_small:"8.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Salads",   name:"Garden Salad",        description:"Mixed greens, tomato, cucumber, choice of dressing",price_small:"7.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Drinks",   name:"Soda",                description:"Coke, Diet Coke, Sprite, Dr Pepper",               price_small:"2.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Drinks",   name:"Fresh Lemonade",      description:"House-made fresh-squeezed daily",                   price_small:"3.49",  price_medium:"",      price_large:"",      available:"TRUE", badge:"NEW"},
+  {category:"Drinks",   name:"Iced Tea",            description:"Sweet or unsweet",                                  price_small:"2.49",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Desserts", name:"Tiramisu",            description:"Classic Italian, espresso & mascarpone",            price_small:"6.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+  {category:"Desserts", name:"Cannoli",             description:"Crispy shell, ricotta cream, chocolate chips (2)",  price_small:"5.99",  price_medium:"",      price_large:"",      available:"TRUE", badge:""},
+];
+
+// ─── Fetch from Google Sheets ────────────────────────────────
+async function loadMenu() {
+  if (https://docs.google.com/spreadsheets/d/e/2PACX-1vT4mXaiCOoI4farHelLWK82LUH2Huviu-tMUJRg01bQS95MaTNzNdw-v76UiP5kuQ/pub?gid=822845834&single=true&output=csv) {
+    // Show demo
+    document.getElementById("refreshLabel").textContent = "Demo Mode";
+    renderBoard(DEMO_DATA);
+    return;
+  }
+
+  try {
+    // Use a CORS proxy approach: Google Sheets published CSV supports direct fetch
+    const res  = await fetch(CONFIG.SHEET_CSV_URL + "&cachebust=" + Date.now());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (rows.length === 0) throw new Error("Empty sheet or wrong format.");
+    renderBoard(rows);
+    document.getElementById("refreshDot").style.background = "var(--green)";
+  } catch (err) {
+    console.error("Menu load failed:", err);
+    document.getElementById("board").innerHTML = `
+      <div style="grid-column:1/-1">
+        <div class="error-msg">
+          ⚠️ Could not load menu from Google Sheets.<br>
+          Check your SHEET_CSV_URL in the CONFIG section and make sure the sheet is published.<br><br>
+          <small style="font-size:26px;color:#aaa;">Error: ${err.message}</small>
+        </div>
+      </div>`;
+    document.getElementById("refreshDot").style.background = "#E74C3C";
+  }
+}
+
+// Initial load + auto-refresh
+loadMenu();
+setInterval(loadMenu, CONFIG.REFRESH_SECONDS * 1000);
+</script>
 </body>
 </html>
 
