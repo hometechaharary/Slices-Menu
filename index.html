@@ -472,7 +472,7 @@
 <script>
 const CONFIG = {
   // ← PASTE YOUR GOOGLE SHEETS CSV PUBLISH URL HERE ↓
-  SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4mXaiCOoI4farHelLWK82LUH2Huviu-tMUJRg01bQS95MaTNzNdw-v76UiP5kuQ/pub?output=csv",
+  SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4mXaiCOoI4farHelLWK82LUH2Huviu-tMUJRg01bQS95MaTNzNdw-v76UiP5kuQ/pubhtml",
 
   STORE_NAME:    "PIZZERIA",
   STORE_TAGLINE: "Wood-Fired Since 1987",
@@ -563,24 +563,68 @@ updateClock();
 setInterval(updateClock, 15000);
 
 // ─── CSV parser ─────────────────────────────────────────────
+function splitCSVLine(line) {
+  const cells = [];
+  let cur = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { cells.push(cur.trim()); cur = ""; }
+    else cur += line[i];
+  }
+  cells.push(cur.trim());
+  return cells.map(c => c.replace(/^"|"$/g, "").trim());
+}
+
+// Normalize a header: strip BOM, lowercase, remove spaces/underscores/hyphens
+function normHeader(h) {
+  return h.replace(/^\uFEFF/, "").toLowerCase().replace(/[\s_\-]+/g, "");
+}
+
+// Maps normalized header → canonical field name used in the rest of the code
+const HEADER_MAP = {
+  "category":        "category",
+  "cat":             "category",
+  "name":            "name",
+  "itemname":        "name",
+  "item":            "name",
+  "description":     "description",
+  "desc":            "description",
+  "pricesmall":      "price_small",
+  "small":           "price_small",
+  "pricesm":         "price_small",
+  "sm":              "price_small",
+  "pricemedium":     "price_medium",
+  "medium":          "price_medium",
+  "pricemd":         "price_medium",
+  "md":              "price_medium",
+  "pricelarge":      "price_large",
+  "large":           "price_large",
+  "pricelg":         "price_large",
+  "lg":              "price_large",
+  "price":           "price_small",   // single-price sheets
+  "available":       "available",
+  "active":          "available",
+  "show":            "available",
+  "badge":           "badge",
+  "tag":             "badge",
+  "label":           "badge",
+};
+
 function parseCSV(text) {
-  const lines = text.trim().split("\n").map(l => l.replace(/\r/g, ""));
+  const lines = text.replace(/\r/g, "").trim().split("\n");
   if (lines.length < 2) return [];
-  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+
+  const rawHeaders = splitCSVLine(lines[0]);
+  // Build index: position → canonical field name
+  const fieldNames = rawHeaders.map(h => HEADER_MAP[normHeader(h)] || normHeader(h));
+
   return lines.slice(1).map(line => {
-    // Handle quoted fields
-    const cells = [];
-    let cur = "", inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      if (line[i] === '"') { inQ = !inQ; }
-      else if (line[i] === ',' && !inQ) { cells.push(cur.trim()); cur = ""; }
-      else cur += line[i];
-    }
-    cells.push(cur.trim());
+    if (!line.trim()) return null;
+    const cells = splitCSVLine(line);
     const row = {};
-    headers.forEach((h, i) => row[h] = (cells[i] || "").replace(/^"|"$/g, ""));
+    fieldNames.forEach((field, i) => { row[field] = cells[i] || ""; });
     return row;
-  });
+  }).filter(Boolean);
 }
 
 // ─── Render helpers ─────────────────────────────────────────
@@ -625,17 +669,24 @@ function renderItem(item) {
 }
 
 function renderBoard(rows) {
-  // Filter available
+  // Debug: log what fields were actually parsed from the sheet
+  if (rows.length > 0) {
+    console.log("[MenuBoard] Detected fields:", Object.keys(rows[0]));
+    console.log("[MenuBoard] Row 1 sample:", rows[0]);
+  }
+
+  // Filter: skip rows with no name, and filter by available flag
   const items = rows.filter(r => {
+    if (!r.name || !r.name.trim()) return false;
     const av = (r.available || "").trim().toUpperCase();
     return av === "" || av === "TRUE" || av === "1" || av === "YES";
   });
 
-  // Group by category (preserve order)
+  // Group by category (preserve order of first appearance)
   const order = [];
   const groups = {};
   items.forEach(item => {
-    const cat = item.category || "Other";
+    const cat = (item.category || "").trim() || "Menu";
     if (!groups[cat]) { groups[cat] = []; order.push(cat); }
     groups[cat].push(item);
   });
@@ -738,5 +789,6 @@ setInterval(loadMenu, CONFIG.REFRESH_SECONDS * 1000);
 </script>
 </body>
 </html>
+
 
 
