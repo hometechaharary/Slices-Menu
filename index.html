@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slices Digital Menu Board</title>
+    <style>
+        /* 4K Portrait Optimization & Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            width: 2160px;
+            height: 3840px;
+            overflow: hidden;
+            padding: 120px 100px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Clean, Centered Logo Background 
+           Uses an SVG data URI representation of your Brooklyn Bridge silhouette logo
+        */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1400px;
+            height: 1400px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-opacity='0.04' stroke-linecap='round' stroke-linejoin='round'><circle cx='250' cy='250' r='230'/><path d='M100 240 Q 250 120 400 240 M100 255 Q 250 145 400 255'/><path d='M195 180 L195 350 M225 175 L225 350 M275 175 L275 350 M305 180 L305 350'/><path d='M195 180 F L225 175 M275 175 L305 180'/><path d='M195 210 A 15 15 0 0 1 225 210 M275 210 A 15 15 0 0 1 305 210 M195 260 A 15 15 0 0 1 225 260 M275 260 A 15 15 0 0 1 305 260'/><path d='M100 240 L100 350 M400 240 L400 350'/><path d='M100 240 L195 280 M225 285 L275 285 M305 280 L400 240'/><text x='250' y='115' font-family='Impact, Arial Black, sans-serif' font-size='52' fill='%23ffffff' fill-opacity='0.04' text-anchor='middle' letter-spacing='3'>SLICES</text><text x='250' y='142' font-family='Arial, sans-serif' font-size='18' fill='%23ffffff' fill-opacity='0.04' text-anchor='middle' letter-spacing='6'>— OF —</text><text x='250' y='410' font-family='Impact, Arial Black, sans-serif' font-size='46' fill='%23ffffff' fill-opacity='0.04' text-anchor='middle' letter-spacing='4'>BROOKLYN</text><path d='M60 290 L440 290 M70 305 L430 305 M85 320 L415 320 M95 335 L405 335' stroke-opacity='0.02'/></svg>");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Content Layer over the background */
+        #menu-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 75px;
+            flex-grow: 1;
+        }
+
+        /* Menu Categories */
+        .menu-category {
+            background: rgba(30, 30, 30, 0.75); /* Semi-transparent background so logo peeks through gracefully */
+            backdrop-filter: blur(5px);
+            padding: 65px;
+            border-radius: 24px;
+            border-left: 14px solid #ffb703;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        .category-title {
+            font-size: 72px;
+            color: #ffb703;
+            text-transform: uppercase;
+            margin-bottom: 45px;
+            border-bottom: 3px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            letter-spacing: 3px;
+            font-weight: 800;
+        }
+
+        /* Menu Items Layout */
+        .menu-item {
+            margin-bottom: 55px;
+        }
+
+        .menu-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .item-name {
+            font-size: 46px;
+            font-weight: 700;
+            color: #ffffff;
+            max-width: 80%;
+            letter-spacing: 1px;
+        }
+
+        .item-price {
+            font-size: 46px;
+            font-weight: 800;
+            color: #02c39a;
+        }
+
+        .item-description {
+            font-size: 32px;
+            color: #cccccc;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        
+        /* Subtle footer ticker */
+        footer {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-size: 24px;
+            color: #555555;
+            margin-top: 30px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu-container">
+        </div>
+
+    <footer>Auto-refreshes every 5 minutes</footer>
+
+    <script>
+        // Replace this string with your published Google Sheets CSV URL
+        const sheetUrl = 'PASTE_YOUR_PUBLISHED_CSV_URL_HERE'; 
+
+        // Automatically reload the browser page every 5 minutes (300000 ms)
+        setInterval(() => {
+            window.location.reload();
+        }, 300000);
+
+        // Robust CSV Parser helper function
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const result = [];
+            if (lines.length === 0 || !lines[0]) return result;
+            
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Matches standard comma separation while ignoring commas inside quote blocks
+                const arr = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
+                const obj = {};
+                
+                headers.forEach((header, index) => {
+                    let val = arr[index] ? arr[index].trim() : '';
+                    obj[header] = val.replace(/^"| Just"$|"/g, ''); 
+                });
+                result.push(obj);
+            }
+            return result;
+        }
+
+        async function fetchMenu() {
+            try {
+                const response = await fetch(sheetUrl);
+                const dataText = await response.text();
+                const menuItems = parseCSV(dataText);
+                
+                // Keep tracks of spreadsheet entries by category grouping
+                const groupedMenu = {};
+                menuItems.forEach(item => {
+                    if (!item.Category) return;
+                    const catUpper = item.Category.trim().toUpperCase();
+                    if (!groupedMenu[catUpper]) {
+                        groupedMenu[catUpper] = [];
+                    }
+                    groupedMenu[catUpper].push(item);
+                });
+
+                const container = document.getElementById('menu-container');
+                container.innerHTML = ''; 
+
+                // Inject structural blocks dynamically 
+                for (const category in groupedMenu) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'menu-category';
+
+                    let itemsHtml = `<h2 class="category-title">${category}</h2>`;
+                    
+                    groupedMenu[category].forEach(item => {
+                        // Formatting prices cleanly to 2 decimals
+                        const cleanPrice = !isNaN(parseFloat(item.Price)) ? parseFloat(item.Price).toFixed(2) : item.Price;
+                        
+                        itemsHtml += `
+                            <div class="menu-item">
+                                <div class="item-header">
+                                    <span class="item-name">${item.Name}</span>
+                                    <span class="item-price">$${cleanPrice}</span>
+                                </div>
+                                ${item.Description ? `<p class="item-description">${item.Description}</p>` : ''}
+                            </div>
+                        `;
+                    });
+
+                    categoryDiv.innerHTML = itemsHtml;
+                    container.appendChild(categoryDiv);
+                }
+
+            } catch (error) {
+                console.error('Error processing live data feed:', error);
+                document.getElementById('menu-container').innerHTML = '<p style="font-size:44px; color:\#ffb703; text-align:center; margin-top:200px;">Updating menu options... check connection if display persists.</p>';
+            }
+        }
+
+        // Initialize display fetch on initial screen load
+        fetchMenu();
+    </script>
+</body>
+</html>
