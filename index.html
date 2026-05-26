@@ -43,25 +43,6 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none; z-index: 1000; opacity: 0.5;
   }
-    /* Logo watermark — centred, large, very faint */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80vw;
-    height: 80vw;
-    background-image: url("https://github.com/hometechaharary/Slices-Menu/blob/main/logo.jpg");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.06;
-    pointer-events: none;
-    z-index: 0;
-    border-radius: 50%;
-    filter: grayscale(100%);
-  }
-
   /* ── HEADER — stacked portrait layout ── */
   .header {
     display: flex;
@@ -146,16 +127,16 @@
   .item:last-child { margin-bottom: 0; }
   .item:hover { border-color: rgba(212,146,10,0.4); background: var(--panel-hover); }
   .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1vw; }
-  .item-name { font-family: var(--font-heading); font-size: 2.5vw; font-weight: 700; color: var(--white); line-height: 1.1; flex: 1; }
+  .item-name { font-family: var(--font-heading); font-size: 1.5vw; font-weight: 700; color: var(--white); line-height: 1.1; flex: 1; }
   .item-desc { font-family: var(--font-body); font-size: 1.35vw; color: var(--muted); margin-top: 0.5vw; line-height: 1.4; }
 
   /* Pricing */
   .price-area { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3vw; flex-shrink: 0; }
-  .price-single { font-family: var(--font-heading); font-size: 3.2vw; font-weight: 800; color: var(--gold-light); line-height: 1; white-space: nowrap; }
+  .price-single { font-family: var(--font-heading); font-size: 2.2vw; font-weight: 800; color: var(--gold-light); line-height: 1; white-space: nowrap; }
   .price-multi { display: flex; gap: 1vw; align-items: center; }
   .price-tier { display: flex; flex-direction: column; align-items: center; gap: 0.15vw; }
   .price-tier .size { font-family: var(--font-heading); font-size: 1.1vw; letter-spacing: 0.12vw; color: var(--muted); text-transform: uppercase; }
-  .price-tier .amt { font-family: var(--font-heading); font-size: 2.7vw; font-weight: 800; color: var(--gold-light); line-height: 1; }
+  .price-tier .amt { font-family: var(--font-heading); font-size: 2.0vw; font-weight: 800; color: var(--gold-light); line-height: 1; }
   .price-divider { width: 0.05vw; height: 2vw; background: var(--border); }
 
   /* Badges */
