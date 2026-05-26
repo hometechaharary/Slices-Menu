@@ -25,9 +25,8 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  /* Portrait 4K: viewport is 2160px wide × 3840px tall.
-     All sizing in vw so everything scales proportionally to screen width. */
+ /* All sizing is vw-based so the layout scales to any screen width —
+     looks correct on a 4K TV (3840px), 1080p monitor, or anything between. */
   html, body {
     width: 100vw;
     min-height: 100vh;
@@ -43,59 +42,52 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none; z-index: 1000; opacity: 0.5;
   }
-  /* ── HEADER — stacked portrait layout ── */
+
+  /* HEADER */
   .header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 2.8vw 4vw 2vw;
-    border-bottom: 0.15vw solid var(--border);
+    justify-content: space-between;
+    padding: 1.4vw 3.1vw 1.1vw;
+    border-bottom: 0.08vw solid var(--border);
     background: linear-gradient(180deg, #1A1005 0%, transparent 100%);
     position: relative;
-    gap: 1.2vw;
   }
   .header::after {
     content: '';
     position: absolute;
-    bottom: -0.15vw; left: 0; right: 0; height: 0.05vw;
+    bottom: -0.08vw; left: 0; right: 0; height: 0.03vw;
     background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
   }
-
-  /* Top row: emblem + name + clock side by side */
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    gap: 2vw;
-  }
-
-  .logo-area { display: flex; align-items: center; gap: 2vw; }
+  .logo-area { display: flex; align-items: center; gap: 1.25vw; }
   .logo-emblem {
-    width: 7.5vw; height: 7.5vw;
-    border: 0.18vw solid var(--gold);
+    width: 4.2vw; height: 4.2vw;
+    border: 0.1vw solid var(--gold);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     background: radial-gradient(circle at 40% 35%, #2A1C08, #0D0A06);
-    box-shadow: 0 0 2.5vw rgba(212,146,10,0.25), inset 0 0 1.2vw rgba(212,146,10,0.08);
+    box-shadow: 0 0 1.5vw rgba(212,146,10,0.25), inset 0 0 0.8vw rgba(212,146,10,0.08);
     flex-shrink: 0;
   }
-  .logo-emblem span { font-size: 3vw; line-height: 1; }
-  .logo-text h1 { font-family: var(--font-display); font-size: 2.5vw; line-height: 0.9; color: var(--white); font-weight: 900; letter-spacing: -0.08vw; }
+  .logo-emblem span { font-family: var(--font-display); font-size: 1.7vw; line-height: 1; color: var(--gold-light); }
+  .logo-text h1 { font-family: var(--font-display); font-size: 2.8vw; line-height: 0.9; color: var(--white); font-weight: 900; letter-spacing: -0.05vw; }
   .logo-text h1 em { color: var(--gold-light); font-style: italic; }
-  .logo-text p { font-family: var(--font-heading); font-size: 1.2vw; letter-spacing: 0.5vw; color: var(--muted); text-transform: uppercase; margin-top: 0.3vw; }
-
-  .header-right { text-align: right; flex-shrink: 0; }
-  .clock { font-family: var(--font-heading); font-size: 3.5vw; font-weight: 700; color: var(--gold-light); letter-spacing: 0.15vw; line-height: 1; }
-  .date-line { font-family: var(--font-heading); font-size: 1.1vw; color: var(--muted); letter-spacing: 0.15vw; text-transform: uppercase; margin-top: 0.3vw; }
+  .logo-text p { font-family: var(--font-heading); font-size: 0.75vw; letter-spacing: 0.3vw; color: var(--muted); text-transform: uppercase; margin-top: 0.2vw; }
+  .header-divider { width: 0.08vw; height: 3.1vw; background: linear-gradient(180deg, transparent, var(--gold), transparent); flex-shrink: 0; }
+  .header-tagline { text-align: center; flex: 1; }
+  .header-tagline .big { font-family: var(--font-display); font-size: 1.35vw; color: var(--gold-pale); font-style: italic; }
+  .header-tagline .small { font-family: var(--font-heading); font-size: 0.65vw; letter-spacing: 0.16vw; color: var(--muted); text-transform: uppercase; margin-top: 0.26vw; }
+  .header-right { text-align: right; }
+  .clock { font-family: var(--font-heading); font-size: 1.88vw; font-weight: 700; color: var(--gold-light); letter-spacing: 0.1vw; line-height: 1; }
+  .date-line { font-family: var(--font-heading); font-size: 0.65vw; color: var(--muted); letter-spacing: 0.1vw; text-transform: uppercase; margin-top: 0.2vw; }
   .refresh-badge {
-    display: inline-flex; align-items: center; gap: 0.4vw;
-    margin-top: 0.6vw; padding: 0.35vw 0.8vw;
-    background: rgba(212,146,10,0.1); border: 0.05vw solid rgba(212,146,10,0.3);
-    border-radius: 2vw; font-family: var(--font-heading); font-size: 0.85vw;
-    color: var(--gold); letter-spacing: 0.08vw; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 0.26vw;
+    margin-top: 0.47vw; padding: 0.26vw 0.57vw;
+    background: rgba(212,146,10,0.1); border: 0.03vw solid rgba(212,146,10,0.3);
+    border-radius: 1vw; font-family: var(--font-heading); font-size: 0.52vw;
+    color: var(--gold); letter-spacing: 0.05vw; text-transform: uppercase;
   }
-  .refresh-dot { width: 0.55vw; height: 0.55vw; border-radius: 50%; background: var(--green); box-shadow: 0 0 0.4vw var(--green); animation: pulse 2s infinite; }
+  .refresh-dot { width: 0.36vw; height: 0.36vw; border-radius: 50%; background: var(--green); box-shadow: 0 0 0.26vw var(--green); animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
   /* Bottom row: divider line + tagline */
