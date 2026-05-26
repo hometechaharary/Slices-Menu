@@ -300,12 +300,12 @@ function fmtPrice(val) {
   return isNaN(n) ? null : `$${n.toFixed(2)}`;
 }
 
-function renderPrices(item, isPizza (Slice/Pie) {
+function renderPrices(item, isPizza {
   const s = fmtPrice(item.price_small);
   const m = fmtPrice(item.price_medium);
   const l = fmtPrice(item.price_large);
   // Pizza: show Slice + Pie labels (s = slice, l = pie; m unused)
-  if (isPizza (Slice/Pie) && (s || l)) {
+  if (isPizza && (s || l)) {
     let html = `<div class="price-multi">`;
     if (s) html += `<div class="price-tier"><span class="size">Slice</span><span class="amt">${s}</span></div>`;
     if (s && l) html += `<div class="price-divider"></div>`;
