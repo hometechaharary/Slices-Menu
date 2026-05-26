@@ -300,7 +300,7 @@ function fmtPrice(val) {
   return isNaN(n) ? null : `$${n.toFixed(2)}`;
 }
 
-function renderPrices(item, isPizza} {
+function renderPrices(item, isPizza) {
   const s = fmtPrice(item.price_small);
   const m = fmtPrice(item.price_medium);
   const l = fmtPrice(item.price_large);
