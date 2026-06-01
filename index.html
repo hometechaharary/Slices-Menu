@@ -38,24 +38,47 @@
     z-index: 0;
   }
 
-  /* ── HEADER: single row, left=name+tagline, right=clock+live ── */
+  /* ── HEADER: LEFT = name+tagline, RIGHT = live+clock ── */
   .header {
     position: relative; z-index: 1;
     flex-shrink: 0;
     background: linear-gradient(180deg, #1a0000 0%, #2d0000 100%);
     border-bottom: 2px solid #c41e3a;
-    padding: 0.6vh 2vw;
+    padding: 0.55vh 2vw;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 2vw;
   }
 
-  /* RIGHT: clock + live badge */
+  /* LEFT: store name + tagline */
+  .header-left {
+    text-align: left;
+  }
+  .store-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3.4vh;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #fff;
+    text-shadow: 0 0 2vw rgba(196,30,58,0.7);
+    text-transform: uppercase;
+    line-height: 1.05;
+  }
+  .store-tagline {
+    font-size: 1.1vh;
+    color: #c41e3a;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 0.15vh;
+  }
+
+  /* RIGHT: live badge + clock stacked */
   .header-right {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 0.3vh;
   }
   .header-clock {
@@ -95,29 +118,6 @@
     text-transform: uppercase;
   }
 
-  /* LEFT: store name + tagline */
-  .header-left {
-    text-align: left;
-  }
-  .store-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: 3.4vh;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    color: #fff;
-    text-shadow: 0 0 2vw rgba(196,30,58,0.7);
-    text-transform: uppercase;
-    line-height: 1.05;
-  }
-  .store-tagline {
-    font-size: 1.1vh;
-    color: #c41e3a;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-top: 0.15vh;
-  }
-
   /* ── BOARD ── */
   .board {
     position: relative; z-index: 1;
@@ -132,6 +132,7 @@
     overflow: hidden;
   }
 
+  /* Pizza spans ALL 3 columns */
   .cat-block.wide { grid-column: 1 / -1; }
 
   .cat-block {
@@ -158,8 +159,9 @@
     color: #f5d66b;
   }
 
-  .item-grid { display: grid; grid-template-columns: 1fr; }
-  .wide .item-grid { grid-template-columns: 1fr 1fr; }
+  /* Pizza items: 3-col grid inside the wide block */
+  .item-grid            { display: grid; grid-template-columns: 1fr; }
+  .wide .item-grid      { grid-template-columns: 1fr 1fr 1fr; }
 
   .menu-item {
     padding: 0.55vh 1vw;
@@ -167,11 +169,23 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.8vw;
+    gap: 0.6vw;
   }
   .menu-item:last-child { border-bottom: none; }
 
-  .item-left { flex: 1; min-width: 0; }
+  .item-left {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Name row: name text + badge side by side */
+  .item-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+  }
   .item-name {
     font-family: 'Oswald', sans-serif;
     font-size: 1.5vh;
@@ -182,6 +196,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .item-badge {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 0.05vh 0.4vw;
+    border-radius: 0.2vh;
+    font-size: 0.68vh;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  .badge-POPULAR  { background:#c41e3a; color:#fff; }
+  .badge-NEW      { background:#2e7d32; color:#fff; }
+  .badge-SEASONAL { background:#e65100; color:#fff; }
+  .badge-SOLDOUT  { background:#444;    color:#999; }
+  .badge-FEATURED { background:#f5d66b; color:#000; }
+
   .item-desc {
     font-size: 0.85vh;
     color: #999;
@@ -191,23 +223,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .item-badge {
-    display: inline-block;
-    margin-top: 0.15vh;
-    padding: 0 0.4vw;
-    border-radius: 0.2vh;
-    font-size: 0.7vh;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    line-height: 1.6;
-  }
-  .badge-POPULAR  { background:#c41e3a; color:#fff; }
-  .badge-NEW      { background:#2e7d32; color:#fff; }
-  .badge-SEASONAL { background:#e65100; color:#fff; }
-  .badge-SOLDOUT  { background:#444;    color:#999; }
-  .badge-FEATURED { background:#f5d66b; color:#000; }
 
+  /* PRICES on the right */
   .item-price { text-align: right; flex-shrink: 0; }
   .price-single {
     font-family: 'Oswald', sans-serif;
@@ -255,19 +272,19 @@
 <div class="page">
 
   <header class="header">
+    <!-- LEFT: store name + tagline -->
+    <div class="header-left">
+      <div class="store-name">Slices of Brooklyn</div>
+      <div class="store-tagline">Authentic New York Pizza</div>
+    </div>
+
     <!-- RIGHT: clock + live badge -->
-    <div class="header-RIGHT">
+    <div class="header-right">
       <div class="header-clock" id="clock">--:-- --</div>
       <div class="live-badge">
         <div class="live-dot" id="live-dot"></div>
         <span class="live-text" id="live-text">DEMO MODE</span>
       </div>
-    </div>
-
-    <!-- LEFT: store name + tagline -->
-    <div class="header-Left">
-      <div class="store-name">Slices of Brooklyn</div>
-      <div class="store-tagline">Authentic New York Pizza</div>
     </div>
   </header>
 
@@ -304,27 +321,26 @@ var CONFIG = {
 };
 
 var DEMO_DATA = [
-  { category:"Pizza", name:"Margherita",            description:"Fresh mozzarella, basil, San Marzano tomato",         price_small:"3.50", price_large:"22.00", badge:"POPULAR" },
-  { category:"Pizza", name:"Pepperoni",              description:"Classic pepperoni, mozzarella, marinara",             price_small:"4.00", price_large:"24.00", badge:"" },
-  { category:"Pizza", name:"BBQ Chicken",            description:"Grilled chicken, red onion, BBQ drizzle",             price_small:"4.50", price_large:"26.00", badge:"POPULAR" },
-  { category:"Pizza", name:"Veggie Supreme",         description:"Peppers, mushrooms, olives, onions",                  price_small:"4.00", price_large:"23.00", badge:"" },
-  { category:"Pizza", name:"White Pizza",            description:"Ricotta, garlic, olive oil, fresh herbs",             price_small:"4.25", price_large:"25.00", badge:"FEATURED" },
-  { category:"Pizza", name:"Buffalo Chicken",        description:"Spicy buffalo sauce, blue cheese crumble",            price_small:"4.50", price_large:"26.00", badge:"NEW" },
-  { category:"Starters", name:"Garlic Knots",        description:"Fresh-baked, house marinara dip",                     price_small:"5.00", badge:"POPULAR" },
-  { category:"Starters", name:"Mozzarella Sticks",   description:"Fried golden, served with marinara",                  price_small:"7.00", badge:"" },
-  { category:"Starters", name:"Caesar Salad",        description:"Romaine, croutons, parmesan, classic dressing",       price_small:"8.00", price_medium:"10.00", badge:"" },
-  { category:"Pasta",    name:"Spaghetti & Meatballs", description:"Slow-cooked marinara, hand-rolled beef meatballs", price_small:"13.00", badge:"POPULAR" },
-  { category:"Pasta",    name:"Penne Arrabbiata",    description:"Spicy tomato, garlic, fresh chilli",                  price_small:"11.00", badge:"" },
-  { category:"Pasta",    name:"Fettuccine Alfredo",  description:"Creamy parmesan sauce, fresh pasta",                  price_small:"12.00", badge:"FEATURED" },
-  { category:"Drinks",   name:"Soda",                description:"Coke, Diet Coke, Sprite, Orange",                    price_small:"2.50", price_medium:"3.00", price_large:"3.50", badge:"" },
-  { category:"Drinks",   name:"Fresh Lemonade",      description:"Squeezed daily, sweet or unsweetened",               price_small:"3.50", price_medium:"4.50", badge:"POPULAR" },
-  { category:"Drinks",   name:"Iced Tea",            description:"Sweet or unsweet, free refills",                     price_small:"2.50", price_medium:"3.00", badge:"" },
-  { category:"Desserts", name:"Cannoli",             description:"Classic Sicilian, ricotta cream, chocolate chips",    price_small:"4.50", badge:"POPULAR" },
-  { category:"Desserts", name:"Tiramisu",            description:"Espresso-soaked ladyfingers, mascarpone",             price_small:"6.00", badge:"FEATURED" },
-  { category:"Desserts", name:"NY Cheesecake",       description:"New York style, strawberry or plain",                 price_small:"5.50", badge:"" }
+  { category:"Pizza", name:"Margherita",            description:"Fresh mozzarella, basil, San Marzano tomato",          price_small:"3.50", price_large:"22.00", badge:"POPULAR" },
+  { category:"Pizza", name:"Pepperoni",              description:"Classic pepperoni, mozzarella, marinara",              price_small:"4.00", price_large:"24.00", badge:"" },
+  { category:"Pizza", name:"BBQ Chicken",            description:"Grilled chicken, red onion, BBQ drizzle",              price_small:"4.50", price_large:"26.00", badge:"POPULAR" },
+  { category:"Pizza", name:"Veggie Supreme",         description:"Peppers, mushrooms, olives, onions",                   price_small:"4.00", price_large:"23.00", badge:"" },
+  { category:"Pizza", name:"White Pizza",            description:"Ricotta, garlic, olive oil, fresh herbs",              price_small:"4.25", price_large:"25.00", badge:"FEATURED" },
+  { category:"Pizza", name:"Buffalo Chicken",        description:"Spicy buffalo sauce, blue cheese crumble",             price_small:"4.50", price_large:"26.00", badge:"NEW" },
+  { category:"Starters", name:"Garlic Knots",        description:"Fresh-baked, house marinara dip",                      price_small:"5.00", badge:"POPULAR" },
+  { category:"Starters", name:"Mozzarella Sticks",   description:"Fried golden, served with marinara",                   price_small:"7.00", badge:"" },
+  { category:"Starters", name:"Caesar Salad",        description:"Romaine, croutons, parmesan, classic dressing",        price_small:"8.00", price_medium:"10.00", badge:"" },
+  { category:"Pasta",    name:"Spaghetti & Meatballs", description:"Slow-cooked marinara, hand-rolled beef meatballs",  price_small:"13.00", badge:"POPULAR" },
+  { category:"Pasta",    name:"Penne Arrabbiata",    description:"Spicy tomato, garlic, fresh chilli",                   price_small:"11.00", badge:"" },
+  { category:"Pasta",    name:"Fettuccine Alfredo",  description:"Creamy parmesan sauce, fresh pasta",                   price_small:"12.00", badge:"FEATURED" },
+  { category:"Drinks",   name:"Soda",                description:"Coke, Diet Coke, Sprite, Orange",                     price_small:"2.50", price_medium:"3.00", price_large:"3.50", badge:"" },
+  { category:"Drinks",   name:"Fresh Lemonade",      description:"Squeezed daily, sweet or unsweetened",                price_small:"3.50", price_medium:"4.50", badge:"POPULAR" },
+  { category:"Drinks",   name:"Iced Tea",            description:"Sweet or unsweet, free refills",                      price_small:"2.50", price_medium:"3.00", badge:"" },
+  { category:"Desserts", name:"Cannoli",             description:"Classic Sicilian, ricotta cream, chocolate chips",     price_small:"4.50", badge:"POPULAR" },
+  { category:"Desserts", name:"Tiramisu",            description:"Espresso-soaked ladyfingers, mascarpone",              price_small:"6.00", badge:"FEATURED" },
+  { category:"Desserts", name:"NY Cheesecake",       description:"New York style, strawberry or plain",                  price_small:"5.50", badge:"" }
 ];
 
-// Clock
 function updateClock() {
   var now = new Date();
   document.getElementById('clock').textContent =
@@ -333,15 +349,13 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Live badge label
 function updateLiveBadge(isLive) {
-  var el = document.getElementById('live-text');
-  if (el) el.textContent = isLive ? 'LIVE MENU' : 'DEMO MODE';
+  var el  = document.getElementById('live-text');
   var dot = document.getElementById('live-dot');
-  if (dot) dot.style.background = isLive ? '#008000' : '#888';
+  if (el)  el.textContent = isLive ? 'LIVE MENU' : 'DEMO MODE';
+  if (dot) dot.style.background = isLive ? '#c41e3a' : '#888';
 }
 
-// CSV
 function normKey(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 var HEADER_MAP = {
   category:'category', cat:'category',
@@ -407,9 +421,11 @@ function renderItem(item, isPizza) {
 
   return '<div class="menu-item">'
     + '<div class="item-left">'
-    +   '<div class="item-name">' + item.name + '</div>'
+    +   '<div class="item-name-row">'
+    +     '<span class="item-name">' + item.name + '</span>'
+    +     badgeHTML
+    +   '</div>'
     +   (item.description ? '<div class="item-desc">' + item.description + '</div>' : '')
-    +   badgeHTML
     + '</div>'
     + '<div class="item-price">' + priceHTML + '</div>'
     + '</div>';
