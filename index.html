@@ -38,7 +38,7 @@
     z-index: 0;
   }
 
-  /* ── HEADER: LEFT = name+tagline, RIGHT = live+clock ── */
+  /* ── HEADER: LEFT = name+tagline  RIGHT = live+clock ── */
   .header {
     position: relative; z-index: 1;
     flex-shrink: 0;
@@ -48,13 +48,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2vw;
   }
-
-  /* LEFT: store name + tagline */
-  .header-left {
-    text-align: left;
-  }
+  .header-left { text-align: left; }
   .store-name {
     font-family: 'Oswald', sans-serif;
     font-size: 3.4vh;
@@ -73,8 +68,6 @@
     font-weight: 700;
     margin-top: 0.15vh;
   }
-
-  /* RIGHT: live badge + clock stacked */
   .header-right {
     display: flex;
     flex-direction: column;
@@ -99,10 +92,9 @@
     padding: 0.15vh 0.6vw;
   }
   .live-dot {
-    width: 0.7vh;
-    height: 0.7vh;
+    width: 0.7vh; height: 0.7vh;
     border-radius: 50%;
-    background: #008000;
+    background: #888;
     animation: pulse 1.4s ease-in-out infinite;
   }
   @keyframes pulse {
@@ -132,7 +124,7 @@
     overflow: hidden;
   }
 
-  /* Pizza spans ALL 3 columns */
+  /* Pizza spans all columns */
   .cat-block.wide { grid-column: 1 / -1; }
 
   .cat-block {
@@ -159,9 +151,11 @@
     color: #f5d66b;
   }
 
-  /* Pizza items: 3-col grid inside the wide block */
-  .item-grid            { display: grid; grid-template-columns: 1fr; }
-  .wide .item-grid      { grid-template-columns: 1fr 1fr 1fr; }
+  /* Default: single column items */
+  .item-grid { display: grid; grid-template-columns: 1fr; }
+
+  /* Pizza wide block: 3 columns, items flow left-to-right naturally */
+  .wide .item-grid { grid-template-columns: 1fr 1fr 1fr; }
 
   .menu-item {
     padding: 0.55vh 1vw;
@@ -173,39 +167,37 @@
   }
   .menu-item:last-child { border-bottom: none; }
 
-  .item-left {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-  }
+  .item-left { flex: 1; min-width: 0; }
 
-  /* Name row: name text + badge side by side */
+  /* Name + badge on same row */
   .item-name-row {
     display: flex;
     align-items: center;
     gap: 0.5vw;
+    min-width: 0;
   }
   .item-name {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.9vh;
+    font-size: 1.5vh;
     font-weight: 600;
     color: #fff;
-    line-height: 1.6;
+    line-height: 1.15;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
   }
   .item-badge {
     flex-shrink: 0;
     display: inline-block;
     padding: 0.05vh 0.4vw;
     border-radius: 0.2vh;
-    font-size: 1.5vh;
+    font-size: 0.68vh;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    line-height: 1.6;
+    line-height: 1.7;
     white-space: nowrap;
   }
   .badge-POPULAR  { background:#c41e3a; color:#fff; }
@@ -215,7 +207,7 @@
   .badge-FEATURED { background:#f5d66b; color:#000; }
 
   .item-desc {
-    font-size: 1.0.vh;
+    font-size: 0.85vh;
     color: #999;
     margin-top: 0.1vh;
     line-height: 1.2;
@@ -224,7 +216,6 @@
     text-overflow: ellipsis;
   }
 
-  /* PRICES on the right */
   .item-price { text-align: right; flex-shrink: 0; }
   .price-single {
     font-family: 'Oswald', sans-serif;
@@ -250,7 +241,6 @@
   }
   .sold-out-text { font-size: 0.85vh; color: #666; font-style: italic; }
 
-  /* ── FOOTER ── */
   .footer {
     position: relative; z-index: 1;
     flex-shrink: 0;
@@ -272,13 +262,10 @@
 <div class="page">
 
   <header class="header">
-    <!-- LEFT: store name + tagline -->
     <div class="header-left">
       <div class="store-name">Slices of Brooklyn</div>
       <div class="store-tagline">Authentic New York Pizza</div>
     </div>
-
-    <!-- RIGHT: clock + live badge -->
     <div class="header-right">
       <div class="header-clock" id="clock">--:-- --</div>
       <div class="live-badge">
@@ -321,25 +308,28 @@ var CONFIG = {
 };
 
 var DEMO_DATA = [
-  { category:"Pizza", name:"Margherita",            description:"Fresh mozzarella, basil, San Marzano tomato",          price_small:"3.50", price_large:"22.00", badge:"POPULAR" },
-  { category:"Pizza", name:"Pepperoni",              description:"Classic pepperoni, mozzarella, marinara",              price_small:"4.00", price_large:"24.00", badge:"" },
-  { category:"Pizza", name:"BBQ Chicken",            description:"Grilled chicken, red onion, BBQ drizzle",              price_small:"4.50", price_large:"26.00", badge:"POPULAR" },
-  { category:"Pizza", name:"Veggie Supreme",         description:"Peppers, mushrooms, olives, onions",                   price_small:"4.00", price_large:"23.00", badge:"" },
-  { category:"Pizza", name:"White Pizza",            description:"Ricotta, garlic, olive oil, fresh herbs",              price_small:"4.25", price_large:"25.00", badge:"FEATURED" },
-  { category:"Pizza", name:"Buffalo Chicken",        description:"Spicy buffalo sauce, blue cheese crumble",             price_small:"4.50", price_large:"26.00", badge:"NEW" },
-  { category:"Starters", name:"Garlic Knots",        description:"Fresh-baked, house marinara dip",                      price_small:"5.00", badge:"POPULAR" },
-  { category:"Starters", name:"Mozzarella Sticks",   description:"Fried golden, served with marinara",                   price_small:"7.00", badge:"" },
-  { category:"Starters", name:"Caesar Salad",        description:"Romaine, croutons, parmesan, classic dressing",        price_small:"8.00", price_medium:"10.00", badge:"" },
-  { category:"Pasta",    name:"Spaghetti & Meatballs", description:"Slow-cooked marinara, hand-rolled beef meatballs",  price_small:"13.00", badge:"POPULAR" },
-  { category:"Pasta",    name:"Penne Arrabbiata",    description:"Spicy tomato, garlic, fresh chilli",                   price_small:"11.00", badge:"" },
-  { category:"Pasta",    name:"Fettuccine Alfredo",  description:"Creamy parmesan sauce, fresh pasta",                   price_small:"12.00", badge:"FEATURED" },
-  { category:"Drinks",   name:"Soda",                description:"Coke, Diet Coke, Sprite, Orange",                     price_small:"2.50", price_medium:"3.00", price_large:"3.50", badge:"" },
-  { category:"Drinks",   name:"Fresh Lemonade",      description:"Squeezed daily, sweet or unsweetened",                price_small:"3.50", price_medium:"4.50", badge:"POPULAR" },
-  { category:"Drinks",   name:"Iced Tea",            description:"Sweet or unsweet, free refills",                      price_small:"2.50", price_medium:"3.00", badge:"" },
-  { category:"Desserts", name:"Cannoli",             description:"Classic Sicilian, ricotta cream, chocolate chips",     price_small:"4.50", badge:"POPULAR" },
-  { category:"Desserts", name:"Tiramisu",            description:"Espresso-soaked ladyfingers, mascarpone",              price_small:"6.00", badge:"FEATURED" },
-  { category:"Desserts", name:"NY Cheesecake",       description:"New York style, strawberry or plain",                  price_small:"5.50", badge:"" }
+  { category:"Pizza", name:"Margherita",              description:"Fresh mozzarella, basil, San Marzano tomato",        price_small:"3.50", price_large:"22.00", badge:"POPULAR" },
+  { category:"Pizza", name:"Pepperoni",                description:"Classic pepperoni, mozzarella, marinara",            price_small:"4.00", price_large:"24.00", badge:"" },
+  { category:"Pizza", name:"BBQ Chicken",              description:"Grilled chicken, red onion, BBQ drizzle",            price_small:"4.50", price_large:"26.00", badge:"POPULAR" },
+  { category:"Pizza", name:"Veggie Supreme",           description:"Peppers, mushrooms, olives, onions",                 price_small:"4.00", price_large:"23.00", badge:"" },
+  { category:"Pizza", name:"White Pizza",              description:"Ricotta, garlic, olive oil, fresh herbs",            price_small:"4.25", price_large:"25.00", badge:"FEATURED" },
+  { category:"Pizza", name:"Buffalo Chicken",          description:"Spicy buffalo sauce, blue cheese crumble",           price_small:"4.50", price_large:"26.00", badge:"NEW" },
+  { category:"Starters", name:"Garlic Knots",          description:"Fresh-baked, house marinara dip",                    price_small:"5.00", badge:"POPULAR" },
+  { category:"Starters", name:"Mozzarella Sticks",     description:"Fried golden, served with marinara",                 price_small:"7.00", badge:"" },
+  { category:"Starters", name:"Caesar Salad",          description:"Romaine, croutons, parmesan, classic dressing",      price_small:"8.00", price_medium:"10.00", badge:"" },
+  { category:"Pasta",    name:"Spaghetti & Meatballs", description:"Slow-cooked marinara, hand-rolled beef meatballs",   price_small:"13.00", badge:"POPULAR" },
+  { category:"Pasta",    name:"Penne Arrabbiata",      description:"Spicy tomato, garlic, fresh chilli",                 price_small:"11.00", badge:"" },
+  { category:"Pasta",    name:"Fettuccine Alfredo",    description:"Creamy parmesan sauce, fresh pasta",                 price_small:"12.00", badge:"FEATURED" },
+  { category:"Drinks",   name:"Soda",                  description:"Coke, Diet Coke, Sprite, Orange",                   price_small:"2.50", price_medium:"3.00", price_large:"3.50", badge:"" },
+  { category:"Drinks",   name:"Fresh Lemonade",        description:"Squeezed daily, sweet or unsweetened",               price_small:"3.50", price_medium:"4.50", badge:"POPULAR" },
+  { category:"Drinks",   name:"Iced Tea",              description:"Sweet or unsweet, free refills",                     price_small:"2.50", price_medium:"3.00", badge:"" },
+  { category:"Desserts", name:"Cannoli",               description:"Classic Sicilian, ricotta cream, chocolate chips",   price_small:"4.50", badge:"POPULAR" },
+  { category:"Desserts", name:"Tiramisu",              description:"Espresso-soaked ladyfingers, mascarpone",            price_small:"6.00", badge:"FEATURED" },
+  { category:"Desserts", name:"NY Cheesecake",         description:"New York style, strawberry or plain",                price_small:"5.50", badge:"" }
 ];
+
+/* Valid badge values — anything else (including "TRUE","FALSE") is ignored */
+var VALID_BADGES = { POPULAR:1, NEW:1, SEASONAL:1, SOLDOUT:1, FEATURED:1 };
 
 function updateClock() {
   var now = new Date();
@@ -396,13 +386,21 @@ function fmtPrice(v) {
 }
 
 function renderItem(item, isPizza) {
-  var soldOut = (item.badge || '').toUpperCase() === 'SOLDOUT';
+  var badgeRaw   = (typeof item.badge === 'string') ? item.badge.trim() : '';
+  var badgeUpper = badgeRaw.toUpperCase();
+  var isSoldOut  = badgeUpper === 'SOLDOUT';
+
+  /* Only render badge if it's one of the known values */
+  var badgeHTML = (VALID_BADGES[badgeUpper] && !isSoldOut)
+    ? '<span class="item-badge badge-' + badgeUpper + '">' + badgeRaw + '</span>'
+    : '';
+
   var sm = fmtPrice(item.price_small);
   var md = fmtPrice(item.price_medium);
   var lg = fmtPrice(item.price_large);
 
   var priceHTML = '';
-  if (soldOut) {
+  if (isSoldOut) {
     priceHTML = '<div class="sold-out-text">Sold Out</div>';
   } else if (sm && !md && !lg) {
     priceHTML = '<div class="price-single">' + sm + '</div>';
@@ -414,10 +412,6 @@ function renderItem(item, isPizza) {
     if (lg) cols += '<div class="price-col"><span class="price-amount">' + lg + '</span><span class="price-label">' + labels[2] + '</span></div>';
     priceHTML = '<div class="price-group">' + cols + '</div>';
   }
-
-  var badgeUpper = (item.badge || '').toUpperCase();
-  var badgeHTML = (badgeUpper && badgeUpper !== 'SOLDOUT')
-    ? '<span class="item-badge badge-' + badgeUpper + '">' + item.badge + '</span>' : '';
 
   return '<div class="menu-item">'
     + '<div class="item-left">'
@@ -441,8 +435,8 @@ function renderBoard(items) {
   });
   var html = '';
   order.forEach(function(cat) {
-    var icon = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
-    var wide = CONFIG.WIDE_CATEGORIES.indexOf(cat) >= 0;
+    var icon    = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
+    var wide    = CONFIG.WIDE_CATEGORIES.indexOf(cat) >= 0;
     var isPizza = cat.toLowerCase().indexOf('pizza') >= 0;
     var itemsHTML = grouped[cat].map(function(item){ return renderItem(item, isPizza); }).join('');
     html += '<div class="cat-block' + (wide ? ' wide' : '') + '">'
