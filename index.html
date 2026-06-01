@@ -38,7 +38,7 @@
     z-index: 0;
   }
 
-  /* ── HEADER: single row, left=clock+live, right=name+tagline ── */
+  /* ── HEADER: single row, left=name+tagline, right=clock+live ── */
   .header {
     position: relative; z-index: 1;
     flex-shrink: 0;
@@ -51,7 +51,7 @@
     gap: 2vw;
   }
 
-  /* LEFT: clock + live badge */
+  /* RIGHT: clock + live badge */
   .header-left {
     display: flex;
     flex-direction: column;
@@ -95,7 +95,7 @@
     text-transform: uppercase;
   }
 
-  /* RIGHT: store name + tagline */
+  /* LEFT: store name + tagline */
   .header-right {
     text-align: right;
   }
