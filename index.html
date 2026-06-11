@@ -271,6 +271,27 @@
   }
   .footer-motto { font-size: 0.9vh; color: #666; font-style: italic; }
   .footer-note  { font-size: 0.7vh; color: #444; }
+  /* ── STATUS BAR (debug / connection feedback) ── */
+  .status-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 999;
+    padding: 0.4vh 2vw;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85vh;
+    letter-spacing: 0.05em;
+    display: none;
+    align-items: center;
+    gap: 1vw;
+    background: rgba(0,0,0,0.92);
+    border-top: 1px solid #333;
+    color: #aaa;
+  }
+  .status-bar.visible { display: flex; }
+  .status-bar .status-label { color: #f5d66b; font-weight: 700; }
+  .status-bar .status-msg   { flex: 1; }
+  .status-bar .status-close { cursor: pointer; color: #666; }
+  .status-bar .status-close:hover { color: #fff; }
 </style>
 </head>
 <body>
@@ -306,17 +327,24 @@
 
 </div>
 
+<!-- Status / error bar -->
+<div class="status-bar" id="status-bar">
+  <span class="status-label">NOTICE</span>
+  <span class="status-msg" id="status-msg"></span>
+  <span class="status-close" onclick="hideStatus()">&#x2715;</span>
+</div>
+
 <script>
 /* =============================================================
-   CONFIG — edit these values to customise the board
+   CONFIG
    ============================================================= */
 var CONFIG = {
-  SHEET_CSV_URL:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPb9d-Gdydr1_AnemdwDZOoD3324k3VnAqK6NsaI835pVYBYxa5Bao_qGU7t301CzCNHBa_B6CZM-T/pub?output=csv",        // Paste your Google Sheets published CSV URL here
+  SHEET_CSV_URL:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPb9d-Gdydr1_AnemdwDZOoD3324k3VnAqK6NsaI835pVYBYxa5Bao_qGU7t301CzCNHBa_B6CZM-T/pub?output=csv",        // ← Paste your Google Sheets published CSV URL here
   STORE_NAME:      "Slices of Brooklyn",
   STORE_TAGLINE:   "Authentic New York Pizza",
   STORE_MOTTO:     "A Taste of Brooklyn, Right Here",
-  REFRESH_SECONDS: 60,        // How often to reload from Google Sheets
-  GRID_COLUMNS:    3,         // Board columns (3 for landscape 4K)
+  REFRESH_SECONDS: 60,
+  GRID_COLUMNS:    3,
   CATEGORY_ICONS: {
     "Pizza":    "\uD83C\uDF55",
     "Starters": "\uD83E\uDD57",
@@ -325,52 +353,84 @@ var CONFIG = {
     "Drinks":   "\uD83E\uDD64",
     "Desserts": "\uD83C\uDF6E"
   },
-  /* Categories that span the full grid width */
-  WIDE_CATEGORIES: ["Pizza"],
-  /* Categories that use Slice / Whole Pie pricing instead of Sm/Md/Lg */
+  WIDE_CATEGORIES:  ["Pizza"],
   PIZZA_CATEGORIES: ["Pizza"]
 };
 
 /* =============================================================
-   DEMO DATA — shown when no Google Sheet URL is configured
-   Pizza items use price_slice + price_pie
-   All other items use price_small / price_medium / price_large
+   DEMO DATA
    ============================================================= */
 var DEMO_DATA = [
-  /* ── Pizza: always show Slice price AND Whole Pie price ── */
   { category:"Pizza", name:"Margherita",              description:"Fresh mozzarella, basil, San Marzano tomato",       price_slice:"3.50", price_pie:"22.00", badge:"POPULAR"  },
   { category:"Pizza", name:"Pepperoni",               description:"Classic pepperoni, mozzarella, marinara",           price_slice:"4.00", price_pie:"24.00", badge:""         },
   { category:"Pizza", name:"BBQ Chicken",             description:"Grilled chicken, red onion, BBQ drizzle",           price_slice:"4.50", price_pie:"26.00", badge:"POPULAR"  },
   { category:"Pizza", name:"Veggie Supreme",          description:"Peppers, mushrooms, olives, onions",                price_slice:"4.00", price_pie:"23.00", badge:""         },
   { category:"Pizza", name:"White Pizza",             description:"Ricotta, garlic, olive oil, fresh herbs",           price_slice:"4.25", price_pie:"25.00", badge:"FEATURED" },
   { category:"Pizza", name:"Buffalo Chicken",         description:"Spicy buffalo sauce, blue cheese crumble",          price_slice:"4.50", price_pie:"26.00", badge:"NEW"      },
-
-  /* ── Starters: single price ── */
-  { category:"Starters", name:"Garlic Knots",         description:"Fresh-baked, house marinara dip",                   price_small:"5.00",  badge:"POPULAR" },
-  { category:"Starters", name:"Mozzarella Sticks",    description:"Fried golden, served with marinara",                price_small:"7.00",  badge:"" },
+  { category:"Starters", name:"Garlic Knots",         description:"Fresh-baked, house marinara dip",                   price_small:"5.00",  badge:"POPULAR"  },
+  { category:"Starters", name:"Mozzarella Sticks",    description:"Fried golden, served with marinara",                price_small:"7.00",  badge:""         },
   { category:"Starters", name:"Caesar Salad",         description:"Romaine, croutons, parmesan, classic dressing",     price_small:"8.00",  price_medium:"10.00", badge:"" },
-
-  /* ── Pasta: single price ── */
   { category:"Pasta", name:"Spaghetti & Meatballs",   description:"Slow-cooked marinara, hand-rolled beef meatballs",  price_small:"13.00", badge:"POPULAR"  },
   { category:"Pasta", name:"Penne Arrabbiata",        description:"Spicy tomato, garlic, fresh chilli",                price_small:"11.00", badge:""         },
   { category:"Pasta", name:"Fettuccine Alfredo",      description:"Creamy parmesan sauce, fresh pasta",                price_small:"12.00", badge:"FEATURED" },
-
-  /* ── Drinks: small / medium / large ── */
   { category:"Drinks", name:"Soda",                   description:"Coke, Diet Coke, Sprite, Orange",                   price_small:"2.50", price_medium:"3.00", price_large:"3.50", badge:"" },
   { category:"Drinks", name:"Fresh Lemonade",         description:"Squeezed daily, sweet or unsweetened",              price_small:"3.50", price_medium:"4.50", badge:"POPULAR" },
   { category:"Drinks", name:"Iced Tea",               description:"Sweet or unsweet, free refills",                    price_small:"2.50", price_medium:"3.00", badge:"" },
-
-  /* ── Desserts: single price ── */
   { category:"Desserts", name:"Cannoli",              description:"Classic Sicilian, ricotta cream, chocolate chips",   price_small:"4.50", badge:"POPULAR"  },
   { category:"Desserts", name:"Tiramisu",             description:"Espresso-soaked ladyfingers, mascarpone",            price_small:"6.00", badge:"FEATURED" },
   { category:"Desserts", name:"NY Cheesecake",        description:"New York style, strawberry or plain",                price_small:"5.50", badge:""         }
 ];
 
-/* =============================================================
-   VALID BADGE WHITELIST
-   Prevents stray CSV values (TRUE/FALSE/1) from showing as badges
-   ============================================================= */
 var VALID_BADGES = { POPULAR:1, NEW:1, SEASONAL:1, FEATURED:1 };
+
+/* =============================================================
+   STATUS BAR — shows connection errors visibly on screen
+   ============================================================= */
+function showStatus(msg, isError) {
+  var bar = document.getElementById('status-bar');
+  var msgEl = document.getElementById('status-msg');
+  if (!bar || !msgEl) return;
+  msgEl.textContent = msg;
+  bar.style.borderTopColor = isError ? '#c41e3a' : '#2e7d32';
+  bar.classList.add('visible');
+  // auto-hide after 8s if not an error
+  if (!isError) setTimeout(function(){ bar.classList.remove('visible'); }, 8000);
+}
+function hideStatus() {
+  var bar = document.getElementById('status-bar');
+  if (bar) bar.classList.remove('visible');
+}
+
+/* =============================================================
+   URL VALIDATOR — catches common Google Sheets URL mistakes
+   ============================================================= */
+function validateAndFixUrl(url) {
+  url = url.trim();
+  if (!url) return null;
+
+  // Already a correct publish URL
+  if (url.indexOf('/pub?') >= 0 || url.indexOf('output=csv') >= 0) {
+    // Make sure output=csv is present
+    if (url.indexOf('output=csv') < 0) url += '&output=csv';
+    return url;
+  }
+
+  // Regular share URL: https://docs.google.com/spreadsheets/d/SHEET_ID/edit...
+  // Convert to publish URL
+  var match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) {
+    var sheetId = match[1];
+    // Try to extract gid (sheet tab) if present
+    var gidMatch = url.match(/[?&]gid=([0-9]+)/);
+    var gid = gidMatch ? gidMatch[1] : '0';
+    var fixed = 'https://docs.google.com/spreadsheets/d/' + sheetId
+      + '/pub?gid=' + gid + '&single=true&output=csv';
+    showStatus('URL auto-corrected to CSV export format. If still failing, use File \u2192 Share \u2192 Publish to web in Google Sheets.', false);
+    return fixed;
+  }
+
+  return url; // return as-is and let fetch fail naturally
+}
 
 /* =============================================================
    CLOCK
@@ -400,40 +460,59 @@ function updateLiveBadge(isLive) {
 function normKey(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
 var HEADER_MAP = {
-  /* identity */
   category:'category', cat:'category',
   name:'name', itemname:'name', item:'name',
   description:'description', desc:'description',
-  /* pizza pricing */
   priceslice:'price_slice', slice:'price_slice', byslice:'price_slice',
-  pricepie:'price_pie',     pie:'price_pie',     wholepie:'price_pie', fullpie:'price_pie',
-  /* standard pricing */
+  pricepie:'price_pie', pie:'price_pie', wholepie:'price_pie', fullpie:'price_pie',
   pricesmall:'price_small',  small:'price_small',  sm:'price_small',
   pricemedium:'price_medium',medium:'price_medium', med:'price_medium', md:'price_medium',
   pricelarge:'price_large',  large:'price_large',  lg:'price_large',
-  /* availability */
   available:'available', active:'available', show:'available', enabled:'available',
-  /* badge */
   badge:'badge', tag:'badge', label:'badge', highlight:'badge'
 };
 
 function parseCSV(text) {
-  text = text.replace(/^\uFEFF/, ''); // strip BOM
-  var lines = text.trim().split('\n');
+  text = text.replace(/^\uFEFF/, '');
+
+  // Handle both \r\n and \n line endings
+  var lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) return [];
-  var rawHeaders = lines[0].split(',').map(function(h){ return h.trim().replace(/^"|"$/g, ''); });
-  var headers    = rawHeaders.map(function(h){ return HEADER_MAP[normKey(h)] || normKey(h); });
+
+  // Parse header — handle quoted fields
+  var rawHeaders = splitCSVLine(lines[0]);
+  var headers = rawHeaders.map(function(h){ return HEADER_MAP[normKey(h)] || normKey(h); });
+
   var rows = [];
   for (var i = 1; i < lines.length; i++) {
-    var cols = lines[i].split(',').map(function(c){ return c.trim().replace(/^"|"$/g, ''); });
+    if (!lines[i].trim()) continue;
+    var cols = splitCSVLine(lines[i]);
     var row  = {};
-    headers.forEach(function(h, idx){ row[h] = (cols[idx] !== undefined ? cols[idx] : ''); });
-    if (!row.name || !row.name.trim()) continue; // skip blank rows
+    headers.forEach(function(h, idx){ row[h] = cols[idx] !== undefined ? cols[idx].trim() : ''; });
+    if (!row.name || !row.name.trim()) continue;
     var avail = (row.available || '').toUpperCase();
-    if (avail && ['FALSE','0','NO','N','OFF'].indexOf(avail) >= 0) continue; // skip hidden items
+    if (avail && ['FALSE','0','NO','N','OFF'].indexOf(avail) >= 0) continue;
     rows.push(row);
   }
   return rows;
+}
+
+// Proper CSV line splitter — handles quoted fields with commas inside
+function splitCSVLine(line) {
+  var result = [], current = '', inQuotes = false;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current); current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
 }
 
 /* =============================================================
@@ -447,61 +526,34 @@ function fmtPrice(v) {
 
 /* =============================================================
    RENDER ITEM
-   Pizza categories  → always show Slice price + Whole Pie price
-   Other categories  → show Sm / Md / Lg (whichever are present),
-                       or a single price if only one is set
    ============================================================= */
 function renderItem(item, isPizzaCat) {
-  /* ── Badge ── */
   var badgeRaw   = (typeof item.badge === 'string') ? item.badge.trim() : '';
   var badgeUpper = badgeRaw.toUpperCase();
   var isSoldOut  = badgeUpper === 'SOLDOUT';
-  var badgeHTML  = (VALID_BADGES[badgeUpper])
+  var badgeHTML  = VALID_BADGES[badgeUpper]
     ? '<span class="item-badge badge-' + badgeUpper + '">' + badgeRaw + '</span>'
     : '';
 
-  /* ── Pricing ── */
   var priceHTML = '';
 
   if (isSoldOut) {
     priceHTML = '<div class="sold-out-text">Sold Out</div>';
 
   } else if (isPizzaCat) {
-    /* Pizza: Slice | divider | Whole Pie — always two columns */
-    var slicePrice = fmtPrice(item.price_slice);
-    var piePrice   = fmtPrice(item.price_pie);
-    /* Fallback: some sheets may use price_small / price_large */
-    if (!slicePrice) slicePrice = fmtPrice(item.price_small);
-    if (!piePrice)   piePrice   = fmtPrice(item.price_large);
-
-    var priceCols = '';
-    if (slicePrice) {
-      priceCols += '<div class="price-col">'
-        + '<span class="price-amount">' + slicePrice + '</span>'
-        + '<span class="price-label">Slice</span>'
-        + '</div>';
-    }
-    if (slicePrice && piePrice) {
-      priceCols += '<div class="price-divider"></div>';
-    }
-    if (piePrice) {
-      priceCols += '<div class="price-col">'
-        + '<span class="price-amount">' + piePrice + '</span>'
-        + '<span class="price-label">Whole Pie</span>'
-        + '</div>';
-    }
-    priceHTML = priceCols
-      ? '<div class="price-group">' + priceCols + '</div>'
-      : '';
+    var slicePrice = fmtPrice(item.price_slice) || fmtPrice(item.price_small);
+    var piePrice   = fmtPrice(item.price_pie)   || fmtPrice(item.price_large);
+    var cols = '';
+    if (slicePrice) cols += '<div class="price-col"><span class="price-amount">' + slicePrice + '</span><span class="price-label">Slice</span></div>';
+    if (slicePrice && piePrice) cols += '<div class="price-divider"></div>';
+    if (piePrice)   cols += '<div class="price-col"><span class="price-amount">' + piePrice   + '</span><span class="price-label">Whole Pie</span></div>';
+    priceHTML = cols ? '<div class="price-group">' + cols + '</div>' : '';
 
   } else {
-    /* Non-pizza: Sm / Md / Lg */
     var sm = fmtPrice(item.price_small);
     var md = fmtPrice(item.price_medium);
     var lg = fmtPrice(item.price_large);
-
     if (sm && !md && !lg) {
-      /* Only one price — show plainly, no label */
       priceHTML = '<div class="price-single">' + sm + '</div>';
     } else {
       var cols = '';
@@ -529,57 +581,83 @@ function renderItem(item, isPizzaCat) {
    ============================================================= */
 function renderBoard(items) {
   document.getElementById('board').style.setProperty('--cols', CONFIG.GRID_COLUMNS);
-
   var grouped = {}, order = [];
   items.forEach(function(item) {
     var cat = (item.category || 'Other').trim();
     if (!grouped[cat]) { grouped[cat] = []; order.push(cat); }
     grouped[cat].push(item);
   });
-
   var html = '';
   order.forEach(function(cat) {
-    var icon      = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
-    var isWide    = CONFIG.WIDE_CATEGORIES.indexOf(cat) >= 0;
+    var icon       = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
+    var isWide     = CONFIG.WIDE_CATEGORIES.indexOf(cat) >= 0;
     var isPizzaCat = CONFIG.PIZZA_CATEGORIES.indexOf(cat) >= 0;
-
-    var itemsHTML = grouped[cat]
-      .map(function(item){ return renderItem(item, isPizzaCat); })
-      .join('');
-
+    var itemsHTML  = grouped[cat].map(function(item){ return renderItem(item, isPizzaCat); }).join('');
     html += '<div class="cat-block' + (isWide ? ' wide' : '') + '">'
-      + '<div class="cat-header">'
-      +   '<span class="cat-icon">' + icon + '</span>'
-      +   '<span class="cat-name">' + cat + '</span>'
-      + '</div>'
+      + '<div class="cat-header"><span class="cat-icon">' + icon + '</span><span class="cat-name">' + cat + '</span></div>'
       + '<div class="item-grid">' + itemsHTML + '</div>'
       + '</div>';
   });
-
   document.getElementById('board').innerHTML = html;
 }
 
 /* =============================================================
-   LOAD MENU
+   LOAD MENU  — with URL validation, CORS handling, clear errors
    ============================================================= */
+var _retryCount = 0;
+var _maxRetry   = 3;
+
 function loadMenu() {
-  if (!CONFIG.SHEET_CSV_URL) {
+  if (!CONFIG.SHEET_CSV_URL || !CONFIG.SHEET_CSV_URL.trim()) {
     updateLiveBadge(false);
     renderBoard(DEMO_DATA);
     return;
   }
-  fetch(CONFIG.SHEET_CSV_URL + '&t=' + Date.now())
+
+  var url = validateAndFixUrl(CONFIG.SHEET_CSV_URL);
+  if (!url) {
+    showStatus('ERROR: SHEET_CSV_URL is set but appears invalid. Check the URL in CONFIG.', true);
+    updateLiveBadge(false);
+    renderBoard(DEMO_DATA);
+    return;
+  }
+
+  // Bust cache
+  var fetchUrl = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_t=' + Date.now();
+
+  fetch(fetchUrl, { method: 'GET', mode: 'cors', cache: 'no-store' })
     .then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) throw new Error('Server returned HTTP ' + res.status
+        + '. Make sure the sheet is published publicly (File \u2192 Share \u2192 Publish to web).');
       return res.text();
     })
     .then(function(text) {
+      // Sanity check — should look like CSV not HTML
+      if (text.trim().charAt(0) === '<') {
+        throw new Error('Got an HTML page instead of CSV. '
+          + 'Make sure you published as CSV format, not as a web page.');
+      }
       var items = parseCSV(text);
+      if (!items.length) {
+        throw new Error('CSV loaded but no menu items found. '
+          + 'Check that your sheet has a header row and data rows with a "name" column.');
+      }
+      _retryCount = 0;
+      hideStatus();
       updateLiveBadge(true);
-      renderBoard(items.length ? items : DEMO_DATA);
+      renderBoard(items);
     })
     .catch(function(err) {
-      console.warn('Menu load failed, showing demo data:', err);
+      _retryCount++;
+      var msg = 'SHEET CONNECTION ERROR: ' + err.message;
+      if (_retryCount <= _maxRetry) {
+        msg += ' (retry ' + _retryCount + '/' + _maxRetry + ' in 15s)';
+        setTimeout(loadMenu, 15000);
+      } else {
+        msg += ' — Showing demo data. Fix the URL then refresh.';
+      }
+      console.error(msg);
+      showStatus(msg, true);
       updateLiveBadge(false);
       renderBoard(DEMO_DATA);
     });
