@@ -546,7 +546,7 @@ function renderItem(item, isPizzaCat) {
     var cols = '';
     if (slicePrice) cols += '<div class="price-col"><span class="price-amount">' + slicePrice + '</span><span class="price-label">Slice</span></div>';
     if (slicePrice && piePrice) cols += '<div class="price-divider"></div>';
-    if (piePrice)   cols += '<div class="price-col"><span class="price-amount">' + piePrice   + '</span><span class="price-label">Whole Pie</span></div>';
+    if (piePrice)   cols += '<div class="price-col"><span class="price-amount">' + piePrice   + '</span><span class="price-label">Pie</span></div>';
     priceHTML = cols ? '<div class="price-group">' + cols + '</div>' : '';
 
   } else {
