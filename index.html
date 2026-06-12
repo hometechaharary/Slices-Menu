@@ -354,7 +354,8 @@ var CONFIG = {
     "Desserts": "\uD83C\uDF6E"
   },
   WIDE_CATEGORIES:  ["Pizza", "Calzones", "Pasta"],
-  PIZZA_CATEGORIES: ["Pizza", "Calzones"]
+  PIZZA_CATEGORIES: ["Pizza", "Calzones"],
+  PASTA_CATEGORIES: ["Pasta"]
 };
 
 /* =============================================================
@@ -595,6 +596,7 @@ function renderBoard(items) {
     var icon       = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
     var isWide     = CONFIG.WIDE_CATEGORIES.indexOf(cat) >= 0;
     var isPizzaCat = CONFIG.PIZZA_CATEGORIES.indexOf(cat) >= 0;
+    var isPastaCat = CONFIG.PASTA_CATEGORIES.indexOf(cat) >= 0;
     var itemsHTML  = grouped[cat].map(function(item){ return renderItem(item, isPizzaCat); }).join('');
     html += '<div class="cat-block' + (isWide ? ' wide' : '') + '">'
       + '<div class="cat-header"><span class="cat-icon">' + icon + '</span><span class="cat-name">' + cat + '</span></div>'
