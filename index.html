@@ -122,7 +122,9 @@
     gap: 1vh 1.2vw;
     align-content: start;
     overflow: hidden;
+    transition: opacity 0.3s ease;
   }
+  .board.updating { opacity: 0.6; }
 
   .cat-block.wide { grid-column: 1 / -1; }
 
@@ -583,14 +585,30 @@ function renderItem(item, isPizzaCat) {
 /* =============================================================
    RENDER BOARD
    ============================================================= */
+/* Simple string hash to detect data changes */
+function hashString(str) {
+  var h = 0;
+  for (var i = 0; i < str.length; i++) {
+    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+  }
+  return h;
+}
+
+var _lastDataHash = null;
+var _lastItemCount = 0;
+
 function renderBoard(items) {
-  document.getElementById('board').style.setProperty('--cols', CONFIG.GRID_COLUMNS);
+  /* Build the full HTML string first */
+  var board = document.getElementById('board');
+  board.style.setProperty('--cols', CONFIG.GRID_COLUMNS);
+
   var grouped = {}, order = [];
   items.forEach(function(item) {
     var cat = (item.category || 'Other').trim();
     if (!grouped[cat]) { grouped[cat] = []; order.push(cat); }
     grouped[cat].push(item);
   });
+
   var html = '';
   order.forEach(function(cat) {
     var icon       = CONFIG.CATEGORY_ICONS[cat] || '\uD83C\uDF7D\uFE0F';
@@ -603,7 +621,22 @@ function renderBoard(items) {
       + '<div class="item-grid">' + itemsHTML + '</div>'
       + '</div>';
   });
-  document.getElementById('board').innerHTML = html;
+
+  /* Only update the DOM if data actually changed */
+  var newHash = hashString(html);
+  if (newHash === _lastDataHash && items.length === _lastItemCount) {
+    return; /* Nothing changed — skip the DOM update entirely */
+  }
+
+  _lastDataHash  = newHash;
+  _lastItemCount = items.length;
+
+  /* Smooth fade: dim slightly, swap, restore */
+  board.classList.add('updating');
+  setTimeout(function() {
+    board.innerHTML = html;
+    board.classList.remove('updating');
+  }, 150);
 }
 
 /* =============================================================
@@ -664,7 +697,11 @@ function loadMenu() {
       console.error(msg);
       showStatus(msg, true);
       updateLiveBadge(false);
-      renderBoard(DEMO_DATA);
+      /* Only fall back to demo data if we have never successfully loaded live data */
+      if (_lastDataHash === null) {
+        renderBoard(DEMO_DATA);
+      }
+      /* Otherwise keep showing the last good data — don't wipe the board */
     });
 }
 
