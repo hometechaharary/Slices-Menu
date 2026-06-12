@@ -357,7 +357,9 @@ var CONFIG = {
   },
   WIDE_CATEGORIES:  ["Pizza", "Calzones", "Pasta"],
   PIZZA_CATEGORIES: ["Pizza"],
-  PASTA_CATEGORIES: ["Pasta"]
+  PASTA_CATEGORIES: ["Pasta"],
+  /* Only these categories will appear on this board */
+  SHOW_CATEGORIES: ["Pizza", "Calzones", "Pasta"]
 };
 
 /* =============================================================
@@ -605,6 +607,10 @@ function renderBoard(items) {
   var grouped = {}, order = [];
   items.forEach(function(item) {
     var cat = (item.category || 'Other').trim();
+    /* Filter: if SHOW_CATEGORIES is set, only include listed categories */
+    if (CONFIG.SHOW_CATEGORIES && CONFIG.SHOW_CATEGORIES.length > 0) {
+      if (CONFIG.SHOW_CATEGORIES.indexOf(cat) < 0) return;
+    }
     if (!grouped[cat]) { grouped[cat] = []; order.push(cat); }
     grouped[cat].push(item);
   });
